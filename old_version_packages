@@ -1,0 +1,25 @@
+{
+  "name": "backendfirst",
+  "version": "1.0.0",
+  "description": "first backend proj",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shashvat Jain",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "body-parser": "^1.20.0",
+    "bower": "^1.8.14",
+    "connect-flash": "^0.1.1",
+    "express": "^4.18.1",
+    "express-messages": "^1.0.1",
+    "express-session": "^1.17.3",
+    "express-validator": "^5.3.1",
+    "mongoose": "^6.3.4",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pug": "^3.0.2"
+  }
+}

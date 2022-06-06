@@ -1,0 +1,100 @@
+const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcrypt');
+const passport = require('passport');
+const flash = require('connect-flash');
+
+//Bring in User Model
+// const User = require('../models/user')
+const { User } = require('../models/user');
+
+//Register Form
+router.get('/register', async (req,res) => {
+    res.render('register');
+});
+
+//Register Form
+router.post('/register', async (req,res) => {
+    const name = req.body.name;
+    const email = req.body.email;
+    const username = req.body.username;
+    const password = req.body.password;
+    const password2 = req.body.password2;
+
+    req.checkBody('name','Name is Required').notEmpty();
+    req.checkBody('email', 'Email is Required').notEmpty();
+    req.checkBody('email','Email is Invalid').isEmail();
+    req.checkBody('username','Username is Required').notEmpty();
+    req.checkBody('password', 'Password is Required').notEmpty();
+    req.checkBody('password2','Passwords do not match').equals(password);
+
+    //Get Errors
+    let errors = req.validationErrors();
+
+    if(errors){
+        res.render('register',{
+            errors: errors
+        });
+    }
+    // else{
+    //     let newUser = new User({
+    //         name:name,
+    //         email:email,
+    //         username:username,
+    //         password:password
+    //     });
+    //     bcrypt.genSalt(10, (err,salt) => {
+    //         bcrypt.hash(newUser.password, salt, (err,hash) => {
+    //             if(err){
+    //                 console.log(err);
+    //             }
+    //             newUser.password = hash;
+    //             newUser.save((err) => {
+    //                 if(err){
+    //                     console.log(err);
+    //                     return;
+    //                 }
+    //                 else{
+    //                     req.flash('success', 'You have registered and can login in now');
+    //                     res.redirect('/users/login');
+    //                 }
+    //             })
+    //         })
+    //     })
+    // }
+    else {
+        const salt = await bcrypt.genSalt(10);
+        const newUser = await User.create({
+          name: req.body.name,
+          email: req.body.email,
+          username: req.body.username,
+          password: await bcrypt.hash(req.body.password, salt)
+        });
+        newUser.save();
+        req.flash('success', 'You are now registered and can log in');
+        res.redirect('/users/login');
+      }
+});
+
+//Login Form
+router.get('/login', async (req,res) => {
+    res.render('login');
+});
+
+//Login Process
+router.post('/login', async (req, res, next) => {
+    passport.authenticate('local',{
+        successRedirect:'/',
+        failureRedirect:'/users/login',
+        failureFlash: true
+    })(req, res, next);
+});
+
+//Logout process
+router.get('/logout', async(req, res, next) => {
+    req.logout();
+    req.flash('success', 'You are logged out');
+    res.redirect('/users/login');
+});
+
+module.exports = router;
